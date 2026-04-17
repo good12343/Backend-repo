@@ -4,17 +4,22 @@ import requests
 
 app = FastAPI()
 
-# ====== CONFIG ======
 LLAMA_API_URL = "http://54.227.171.175:3000/chat"
 
-# 🔐 API KEY (لازم يطابق Node.js)
-API_KEY = "712825736aA$"
 
+# ====== يقبل أي شكل من Flutter بدون كسر ======
 class ChatRequest(BaseModel):
-    message: str
+    message: str | None = None
+    prompt: str | None = None
+    n_predict: int | None = 100
 
 
-# ====== INTENT ======
+# ====== اختيار النص الصحيح بدون كسر التطبيق ======
+def extract_message(req: ChatRequest):
+    return req.message or req.prompt or ""
+
+
+# ====== INTENT (خفيف بدون تعقيد) ======
 def detect_intent(text: str):
     text = text.lower()
 
@@ -53,21 +58,16 @@ Answer only. Do not repeat the question.
 """.strip()
 
 
-# ====== CALL NODE.JS (WITH AUTH) ======
-def call_llama(prompt: str):
-
-    headers = {
-        "x-api-key": API_KEY   # 🔐 هذا هو المفتاح الصحيح
-    }
+# ====== CALL LLAMA ======
+def call_llama(prompt: str, n_predict: int):
 
     response = requests.post(
         LLAMA_API_URL,
         json={
             "prompt": prompt,
-            "temperature": 0.5,
-            "max_tokens": 400
-        },
-        headers=headers
+            "n_predict": n_predict,
+            "temperature": 0.5
+        }
     )
 
     return response.json()
@@ -77,12 +77,14 @@ def call_llama(prompt: str):
 @app.post("/chat")
 def chat(req: ChatRequest):
 
-    intent = detect_intent(req.message)
-    prompt = build_prompt(req.message, intent)
+    message = extract_message(req)
 
-    llama_response = call_llama(prompt)
+    intent = detect_intent(message)
+    prompt = build_prompt(message, intent)
 
-    # تنظيف الرد بأمان
+    llama_response = call_llama(prompt, req.n_predict or 100)
+
+    # يدعم كل أشكال الرد بدون كسر التطبيق
     result = (
         llama_response.get("reply")
         or llama_response.get("content")
@@ -92,5 +94,5 @@ def chat(req: ChatRequest):
 
     return {
         "intent": intent,
-        "response": result
+        "reply": result   # 🔴 مهم: متوافق مع Flutter عندك
     }
