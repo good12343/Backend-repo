@@ -24,17 +24,18 @@ def detect_intent(text: str):
 
 def build_prompt(message: str, intent: str):
 
-    return f"""You are a smart programming tutor.
+    return f"""You are an expert programming tutor.
 
-If the user message is vague (like "hello" or "hi"), 
-start by suggesting what you can help with in programming.
+RULES:
+- Do NOT repeat the user message
+- Do NOT write "User:" or "Assistant:"
+- Do NOT ask questions back unless necessary
+- Give direct answer only
 
-If the user asks something specific, answer directly.
-
-User:
+TASK:
 {message}
 
-Answer:
+ANSWER:
 """
 
 
@@ -45,7 +46,7 @@ def call_llama(prompt: str, n_predict: int):
         json={
             "prompt": prompt,
             "n_predict": n_predict,
-            "temperature": 0.3,
+            "temperature": 0.2,
             
         },
         headers={
