@@ -24,20 +24,14 @@ def detect_intent(text: str):
 
 def build_prompt(message: str, intent: str):
 
-    history = get_history()
+    return f"""You are a helpful AI programming assistant.
 
-    history_text = ""
-    for msg in history:
-        role = "User" if msg["role"] == "user" else "Assistant"
-        history_text += f"{role}: {msg['content']}\n"
+Answer the following question clearly and directly.
 
-    return f"""You are a professional programming tutor.
+Question:
+{message}
 
-Conversation:
-{history_text}
-
-User: {message}
-Assistant:
+Answer:
 """
 
 
@@ -49,7 +43,7 @@ def call_llama(prompt: str, n_predict: int):
             "prompt": prompt,
             "n_predict": n_predict,
             "temperature": 0.3,
-            "stop": ["<|user|>", "Question:", "Answer:"]
+            
         },
         headers={
             "x-api-key": API_KEY
