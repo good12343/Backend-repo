@@ -24,11 +24,14 @@ def detect_intent(text: str):
 
 def build_prompt(message: str, intent: str):
 
-    return f"""You are a helpful AI programming assistant.
+    return f"""You are a smart programming tutor.
 
-Answer the following question clearly and directly.
+If the user message is vague (like "hello" or "hi"), 
+start by suggesting what you can help with in programming.
 
-Question:
+If the user asks something specific, answer directly.
+
+User:
 {message}
 
 Answer:
