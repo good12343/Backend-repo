@@ -82,6 +82,6 @@ def chat(req: ChatRequest):
     llama_response = call_llama(prompt)
 
     return {
-        "intent": intent,
-        "response": llama_response.get("content", llama_response)
-    }
+    "intent": intent,
+    "response": llama_response.get("reply", llama_response)
+}
