@@ -5,8 +5,6 @@ import requests
 app = FastAPI()
 
 LLAMA_API_URL = "http://54.227.171.175:3000/chat"
-
-# 🔐 API KEY (نفس اللي في Node.js لازم يطابقه)
 API_KEY = "712825736aA$"
 
 
@@ -37,34 +35,34 @@ def detect_intent(text: str):
     return "GENERAL"
 
 
-# ====== PROMPT ======
+# ====== PROMPT (🔥 محسّن جدًا) ======
 def build_prompt(message: str, intent: str):
 
     instruction = {
-        "TEACH": "Explain clearly step by step with simple examples.",
-        "SOLVE": "Give the solution first then short explanation.",
-        "DEBUG": "Find the issue and explain the fix clearly.",
-        "GENERAL": "Answer clearly and simply."
+        "TEACH": "Explain step-by-step with a simple example.",
+        "SOLVE": "Give the final solution first, then a short explanation.",
+        "DEBUG": "Identify the bug and provide the fix only.",
+        "GENERAL": "Answer clearly and briefly."
     }
 
-    return f"""
-You are a helpful programming tutor.
+    return f"""<|system|>
+You are a professional programming tutor.
+- Do NOT repeat the question
+- Do NOT generate multiple Q&A
+- Give ONE clear answer only
 
-Instruction:
-{instruction[intent]}
-
-Question:
+<|user|>
 {message}
 
-Answer only. Do not repeat the question.
+<|assistant|>
 """.strip()
 
 
-# ====== CALL NODE (WITH AUTH) ======
+# ====== CALL NODE ======
 def call_llama(prompt: str, n_predict: int):
 
     headers = {
-        "x-api-key": API_KEY  # 🔐 هذا هو المهم
+        "x-api-key": API_KEY
     }
 
     response = requests.post(
@@ -72,12 +70,25 @@ def call_llama(prompt: str, n_predict: int):
         json={
             "prompt": prompt,
             "n_predict": n_predict,
-            "temperature": 0.5
+            "temperature": 0.3,
+            "stop": ["<|user|>", "Question:", "Answer:"]
         },
         headers=headers
     )
 
     return response.json()
+
+
+# ====== CLEAN RESPONSE (🔥 مهم جدًا) ======
+def clean_output(text: str):
+    if not text:
+        return ""
+
+    # إزالة أي تكرار مزعج
+    for token in ["Question:", "Answer:", "<|assistant|>"]:
+        text = text.replace(token, "")
+
+    return text.strip()
 
 
 # ====== API ======
@@ -91,12 +102,14 @@ def chat(req: ChatRequest):
 
     llama_response = call_llama(prompt, req.n_predict or 100)
 
-    result = (
+    raw = (
         llama_response.get("reply")
         or llama_response.get("content")
         or llama_response.get("response")
         or str(llama_response)
     )
+
+    result = clean_output(raw)
 
     return {
         "intent": intent,
