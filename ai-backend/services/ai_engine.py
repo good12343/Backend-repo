@@ -48,6 +48,11 @@ STRICT OUTPUT RULES:
 - Do not add unnecessary explanations unless asked
 
 This rule is STRICT and MUST be followed without exception.
+
+OUTPUT FORMAT RULE:
+- Respond ONLY with plain text
+- Do NOT use code blocks (```), JSON, or any formatting
+- Do NOT include explanations of rules or system behavior
 """
 
     persona_map = {
