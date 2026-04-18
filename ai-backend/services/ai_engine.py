@@ -85,7 +85,7 @@ def call_llama(prompt: str, n_predict: int):
         )
 
         print("STATUS:", response.status_code)
-        print("RAW:", response.text)
+        print("LLAMA RESPONSE RAW:", response.text)
 
         # 🔥 حماية كاملة من الكراش
         try:
@@ -129,6 +129,7 @@ def generate_response(message: str, n_predict: int = 100):
     add_message("assistant", result)
 
     return {
-        "intent": intent,
-        "reply": result
-    }
+    "intent": intent,
+    "reply": result,
+    "raw_model": llama_response
+}
