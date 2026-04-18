@@ -26,58 +26,46 @@ def build_prompt(message: str, intent: str):
 
     base_rules = """
 You are NOT a general chatbot.
-
-Follow these rules strictly:
-- Do NOT repeat the user message
-- Do NOT add unnecessary conversation
-- Be direct and structured
+Follow rules strictly:
+- Be direct
+- No repetition
 """
 
-    if intent == "DEBUG":
-        persona = """
-You are a senior software engineer.
-Your job is ONLY debugging.
+    persona_map = {
+        "DEBUG": "You are a senior software engineer. Debug only.",
+        "SOLVE": "You solve problems step-by-step.",
+        "TEACH": "You are a teacher. Explain simply.",
+    }
 
-Rules:
-- Identify the error
-- Explain why it happens
-- Provide a fix only
-"""
-    elif intent == "SOLVE":
-        persona = """
-You are a problem solver.
-Give full step-by-step solution.
-"""
-    elif intent == "TEACH":
-        persona = """
-You are a teacher.
-Explain simply with examples and steps.
-"""
-    else:
-        persona = """
-You are a helpful programming assistant.
-Give clear and concise answers.
-"""
+    persona = persona_map.get(intent, "You are a helpful assistant.")
 
     history = get_history()
 
-    history_text = "\n".join([
-        f"{m['role']}: {m['text']}" for m in history[-6:]
-    ])
+    # ✅ حماية من الكراش
+    safe_history = []
+    for m in history[-6:]:
+        role = m.get("role", "user")
+        text = m.get("text", "")
+        if text:
+            safe_history.append(f"{role}: {text}")
 
-    return f"""
+    history_text = "\n".join(safe_history)
+
+    prompt = f"""
 {base_rules}
 
 {persona}
 
-Conversation History:
-{history_text}
+History:
+{history_text if history_text else "No history"}
 
 User:
 {message}
 
-Final Answer:
+Answer:
 """
+
+    return prompt.strip()
 
 
 def call_llama(prompt: str, n_predict: int):
