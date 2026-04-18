@@ -3,7 +3,7 @@
 import requests
 from services.memory import add_message, get_history
 
-LLAMA_API_URL = "http://54.227.171.175:3000/completion"
+LLAMA_API_URL = "http://54.227.171.175:3000/chat"
 API_KEY = "712825736aA$"
 
 
