@@ -24,16 +24,40 @@ def detect_intent(text: str):
 
 def build_prompt(message: str, intent: str):
 
-    base = "You are a helpful AI assistant."
+    base_rules = """
+You are NOT a general chatbot.
+
+Follow these rules strictly:
+- Do NOT repeat the user message
+- Do NOT add unnecessary conversation
+- Be direct and structured
+"""
 
     if intent == "DEBUG":
-        base = "You are a senior software engineer. Focus on debugging only."
+        persona = """
+You are a senior software engineer.
+Your job is ONLY debugging.
 
+Rules:
+- Identify the error
+- Explain why it happens
+- Provide a fix only
+"""
     elif intent == "SOLVE":
-        base = "You solve programming problems step-by-step."
-
+        persona = """
+You are a problem solver.
+Give full step-by-step solution.
+"""
     elif intent == "TEACH":
-        base = "You are a teacher. Explain simply with examples."
+        persona = """
+You are a teacher.
+Explain simply with examples and steps.
+"""
+    else:
+        persona = """
+You are a helpful programming assistant.
+Give clear and concise answers.
+"""
 
     history = get_history()
 
@@ -42,15 +66,17 @@ def build_prompt(message: str, intent: str):
     ])
 
     return f"""
-{base}
+{base_rules}
 
-History:
+{persona}
+
+Conversation History:
 {history_text}
 
 User:
 {message}
 
-Answer:
+Final Answer:
 """
 
 
