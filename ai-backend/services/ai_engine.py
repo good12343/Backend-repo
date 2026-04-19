@@ -28,7 +28,7 @@ def detect_intent(text: str):
 
 def build_prompt(message: str, intent: str):
 
-    base_rules = base_rules = """
+    base_rules = """
 You must obey ALL rules below. Do not ignore any rule.
 
 You are NOT a general chatbot.
