@@ -64,13 +64,13 @@ RULES:
 
 {persona}
 
-History:
-{history_text if history_text else "No history"}
+Conversation:
+{history_text if history_text else "None"}
 
-User:
+User message:
 {message}
 
-Answer:
+Response (final answer only):
 """
 
     return prompt.strip()
