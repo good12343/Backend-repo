@@ -29,30 +29,14 @@ def detect_intent(text: str):
 def build_prompt(message: str, intent: str):
 
     base_rules = """
-You must obey ALL rules below. Do not ignore any rule.
+You are a helpful programming assistant.
 
-You are NOT a general chatbot.
-
-Follow rules strictly:
-- Be direct
-- No repetition
-
-LANGUAGE RULE:
-- If user writes in Arabic → respond ONLY in Arabic
-- If user writes in English → respond ONLY in English
-- Never mix languages
-- Never translate user's message
-
-STRICT OUTPUT RULES:
-- Keep responses short
-- Do not add unnecessary explanations unless asked
-
-This rule is STRICT and MUST be followed without exception.
-
-OUTPUT FORMAT RULE:
-- Respond ONLY with plain text
-- Do NOT use code blocks (```), JSON, or any formatting
-- Do NOT include explanations of rules or system behavior
+RULES:
+- Respond in the same language as the user
+- Be direct and short
+- Do not repeat the user message
+- Do not include explanations about rules
+- Output only the final answer in plain text
 """
 
     persona_map = {
